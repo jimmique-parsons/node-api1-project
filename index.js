@@ -15,6 +15,27 @@ server.get('/', (req, res) => {
     res.send('Hi I can respond!');
 });
 
+server.post('/api/users', (req, res) => {
+    const userInfo = req.body;
+    console.log(userInfo);
+
+    if (!userInfo.name || !userInfo.bio) {
+        return res.status(400).json({
+            errorMessage: 'Please provide name and bio for the user'
+        });
+    }
+
+    db.insert(userInfo)
+        .then(user => {
+            res.status(201).json(user);
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: "There was an error while saving the user to the database"
+            });
+        });
+});
+
 server.get('/api/users', (req, res) => {
     db.find()
         .then(users => {
