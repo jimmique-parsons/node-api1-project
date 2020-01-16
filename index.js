@@ -67,3 +67,24 @@ server.get('/api/users/:id', (req, res) => {
             });
         });
 });
+
+server.delete('/api/users/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.findById(id)
+        .then(user => {
+            if (user) {
+                db.remove(id)
+                    .then(count => {
+                        if (count === 0) {
+                            res.status(500).json({ error: 'The user could not be removed' });
+                        } else {
+                            res.status(204).end();
+                        }
+                    })
+            } else {
+                res.status(404).json({ message: "The user with the specified ID does not exist." });
+            }
+        })
+
+});
