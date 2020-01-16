@@ -88,3 +88,35 @@ server.delete('/api/users/:id', (req, res) => {
         })
 
 });
+
+server.put('/api/users/:id', (req, res) => {
+    const { id } = req.params;
+    const body = req.body;
+
+    if (!body.name || !body.bio) {
+        return res.status(400).json({ errorMessage: 'Please provide name and bio for the user' });
+    }
+
+    db.findById(id)
+        .then(user => {
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({ message: 'The user with the specified ID does not exist.' });
+            } else {
+                db.update(id, body)
+                    .then(count => {
+                        if (count === 0) {
+                            return res
+                                .status(500)
+                                .json({ error: 'The user information could not be modified' });
+                        } else {
+                            db.findById(id)
+                                .then(user => {
+                                    return res.status(200).json(user);
+                                });
+                        }
+                    });
+            }
+        })
+})
